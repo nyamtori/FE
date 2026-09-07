@@ -1,70 +1,31 @@
-# Getting Started with Create React App
+# 냠토리 (Nyamtori) — Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+냉장고 재료 관리 + 보유 재료 기반 레시피 추천 앱.
 
-## Available Scripts
+## Stack
 
-In the project directory, you can run:
+React 19 + Vite + TypeScript + Tailwind CSS + react-router-dom + `@zxing/browser` (바코드 스캔)
 
-### `npm start`
+## Run
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+npm install
+npm run dev
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Architecture
 
-### `npm test`
+`src/api/`에 백엔드가 아직 없는 상태를 위한 **mock 서비스 레이어**가 있습니다. `getIngredients`, `createIngredient`, `deleteIngredient`, `getRecipes`, `toggleFavoriteRecipe`, `lookupProductByBarcode` 등은 지금은 `localStorage`를 읽고 쓰지만, 실제 백엔드가 준비되면 각 함수 내부만 `fetch` 호출로 바꾸면 됩니다 — 화면 컴포넌트는 이 함수들의 시그니처만 알면 됩니다.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- `src/types` — 도메인 타입 (`Ingredient`, `Recipe`)
+- `src/data` — 초기 mock 데이터 (냉장고 재료, 레시피, 바코드 조회 테이블)
+- `src/api` — mock API 함수 (나중에 실제 백엔드 연동 지점)
+- `src/context/AppContext.tsx` — 재료/레시피/선택 상태를 앱 전역에서 공유
+- `src/components` — 카드, 모달, 바코드 스캐너 등 공용 컴포넌트
+- `src/pages` — 마이 키친 / 마이 냉장고 / 마이 레시피 3개 탭 화면
 
-### `npm run build`
+## 바코드 스캔 관련 참고
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`@zxing/browser`로 실제 카메라를 통해 바코드를 스캔합니다. 스캔에 성공하면 `lookupProductByBarcode`가 바코드 번호로 상품명을 조회하는데, 지금은 `src/data/mockBarcodes.ts`의 샘플 테이블 몇 개만 등록되어 있어 실제 바코드 대부분은 "인식에 실패했어요" 결과가 됩니다 (재시도 또는 직접 입력으로 이어짐). 백엔드에 상품 조회 API가 생기면 `src/api/barcode.ts`의 구현부만 교체하면 됩니다.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+카메라 권한이 없는 환경(예: 브라우저 미리보기 샌드박스)에서는 자동으로 인식 실패 화면으로 전환됩니다.
