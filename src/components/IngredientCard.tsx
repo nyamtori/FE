@@ -4,6 +4,7 @@ interface IngredientCardProps {
   ingredient: Ingredient
   selected: boolean
   onToggleSelect: (id: string) => void
+  onRequestEdit: (ingredient: Ingredient) => void
   onRequestDelete: (id: string) => void
 }
 
@@ -24,6 +25,7 @@ export function IngredientCard({
   ingredient,
   selected,
   onToggleSelect,
+  onRequestEdit,
   onRequestDelete,
 }: IngredientCardProps) {
   const remaining = daysUntil(ingredient.expiryDate)
@@ -41,6 +43,18 @@ export function IngredientCard({
         selected ? 'border-brand-orangeDark' : 'border-transparent'
       }`}
     >
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          onRequestEdit(ingredient)
+        }}
+        aria-label={`${ingredient.name} 수정`}
+        className="absolute right-9 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-brown/10 text-brand-brown"
+      >
+        ✏️
+      </button>
+
       <button
         type="button"
         onClick={(e) => {

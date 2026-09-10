@@ -5,12 +5,14 @@ import { EmojiPicker } from './EmojiPicker'
 import { BarcodeScanner } from './BarcodeScanner'
 import { lookupProductByBarcode } from '../api/barcode'
 import { useApp } from '../context/AppContext'
-import type { Category } from '../types'
+import type { Category, Ingredient } from '../types'
 
 type Tab = 'manual' | 'barcode'
 type Stage = 'form' | 'scanning' | 'scan-failed'
 
 interface RegisterIngredientModalProps {
+  /** 있으면 수정 모드로 동작 — 해당 재료 값으로 폼을 채우고 저장 시 수정 API를 호출한다. */
+  ingredient?: Ingredient
   onClose: () => void
 }
 
@@ -20,17 +22,18 @@ function todayPlus(days: number): string {
   return d.toISOString().slice(0, 10)
 }
 
-export function RegisterIngredientModal({ onClose }: RegisterIngredientModalProps) {
-  const { addIngredient } = useApp()
+export function RegisterIngredientModal({ ingredient, onClose }: RegisterIngredientModalProps) {
+  const { addIngredient, editIngredient } = useApp()
+  const isEditMode = ingredient !== undefined
   const [tab, setTab] = useState<Tab>('manual')
   const [stage, setStage] = useState<Stage>('form')
 
-  const [name, setName] = useState('')
-  const [emoji, setEmoji] = useState('🥚')
-  const [category, setCategory] = useState<Category>('냉장')
-  const [expiryDate, setExpiryDate] = useState(todayPlus(7))
-  const [quantity, setQuantity] = useState(1)
-  const [memo, setMemo] = useState('')
+  const [name, setName] = useState(ingredient?.name ?? '')
+  const [emoji, setEmoji] = useState(ingredient?.emoji ?? '🥚')
+  const [category, setCategory] = useState<Category>(ingredient?.category ?? '냉장')
+  const [expiryDate, setExpiryDate] = useState(ingredient?.expiryDate ?? todayPlus(7))
+  const [quantity, setQuantity] = useState(ingredient?.quantity ?? 1)
+  const [memo, setMemo] = useState(ingredient?.memo ?? '')
 
   async function handleBarcodeDetected(code: string) {
     const product = await lookupProductByBarcode(code)
@@ -51,7 +54,12 @@ export function RegisterIngredientModal({ onClose }: RegisterIngredientModalProp
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
-    await addIngredient({ name: name.trim(), emoji, category, expiryDate, quantity, memo: memo.trim() || undefined })
+    const input = { name: name.trim(), emoji, category, expiryDate, quantity, memo: memo.trim() || undefined }
+    if (isEditMode) {
+      await editIngredient(ingredient.id, input)
+    } else {
+      await addIngredient(input)
+    }
     onClose()
   }
 
@@ -98,7 +106,7 @@ export function RegisterIngredientModal({ onClose }: RegisterIngredientModalProp
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="mb-4 text-xl font-extrabold text-brand-brown">재료 등록</h2>
+      <h2 className="mb-4 text-xl font-extrabold text-brand-brown">{isEditMode ? '재료 수정' : '재료 등록'}</h2>
 
       <div className="mb-4 flex gap-2 rounded-full bg-white p-1">
         <button
@@ -187,7 +195,7 @@ export function RegisterIngredientModal({ onClose }: RegisterIngredientModalProp
           type="submit"
           className="mt-2 rounded-xl bg-brand-orange py-3 font-extrabold text-white"
         >
-          등록하기
+          {isEditMode ? '저장하기' : '등록하기'}
         </button>
       </form>
     </Modal>

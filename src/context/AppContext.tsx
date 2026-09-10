@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Ingredient, Recipe } from '../types'
-import { createIngredient, deleteIngredient, getIngredients } from '../api/ingredients'
+import { createIngredient, deleteIngredient, getIngredients, updateIngredient } from '../api/ingredients'
 import { generateRecipe, getRecipeJobStatus, getRecipes, toggleFavoriteRecipe } from '../api/recipes'
 import type { RecipeJobStatus } from '../api/recipes'
 import { getKakaoLoginUrl } from '../api/auth'
@@ -19,6 +19,7 @@ interface AppContextValue {
   toggleSelectIngredient: (id: string) => void
   clearSelection: () => void
   addIngredient: (input: Omit<Ingredient, 'id'>) => Promise<void>
+  editIngredient: (id: string, input: Omit<Ingredient, 'id'>) => Promise<void>
   removeIngredient: (id: string) => Promise<void>
   toggleFavorite: (id: string) => Promise<void>
   recipeJob: RecipeJobStatus | null
@@ -82,6 +83,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addIngredient = useCallback(async (input: Omit<Ingredient, 'id'>) => {
     const created = await createIngredient(input)
     setIngredients((prev) => [created, ...prev])
+  }, [])
+
+  const editIngredient = useCallback(async (id: string, input: Omit<Ingredient, 'id'>) => {
+    const updated = await updateIngredient(id, input)
+    setIngredients((prev) => prev.map((item) => (item.id === id ? updated : item)))
   }, [])
 
   const removeIngredient = useCallback(async (id: string) => {
@@ -150,6 +156,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toggleSelectIngredient,
       clearSelection,
       addIngredient,
+      editIngredient,
       removeIngredient,
       toggleFavorite,
       recipeJob,
@@ -166,6 +173,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toggleSelectIngredient,
       clearSelection,
       addIngredient,
+      editIngredient,
       removeIngredient,
       toggleFavorite,
       recipeJob,

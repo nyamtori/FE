@@ -4,12 +4,14 @@ import { useApp } from '../context/AppContext'
 import { IngredientCard } from '../components/IngredientCard'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { RegisterIngredientModal } from '../components/RegisterIngredientModal'
+import type { Ingredient } from '../types'
 
 export function MyFridge() {
   const { ingredients, selectedIngredientIds, toggleSelectIngredient, clearSelection, removeIngredient } =
     useApp()
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [showRegister, setShowRegister] = useState(false)
+  const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(null)
   const navigate = useNavigate()
 
   const pendingDeleteName = ingredients.find((i) => i.id === pendingDeleteId)?.name
@@ -45,6 +47,7 @@ export function MyFridge() {
             ingredient={ingredient}
             selected={selectedIngredientIds.includes(ingredient.id)}
             onToggleSelect={toggleSelectIngredient}
+            onRequestEdit={setEditingIngredient}
             onRequestDelete={setPendingDeleteId}
           />
         ))}
@@ -68,6 +71,13 @@ export function MyFridge() {
       )}
 
       {showRegister && <RegisterIngredientModal onClose={() => setShowRegister(false)} />}
+
+      {editingIngredient && (
+        <RegisterIngredientModal
+          ingredient={editingIngredient}
+          onClose={() => setEditingIngredient(null)}
+        />
+      )}
 
       {selectedIngredientIds.length > 0 && (
         <button

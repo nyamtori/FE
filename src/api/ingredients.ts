@@ -60,6 +60,21 @@ export async function createIngredient(input: Omit<Ingredient, 'id'>): Promise<I
   return toIngredient(created)
 }
 
+export async function updateIngredient(id: string, input: Omit<Ingredient, 'id'>): Promise<Ingredient> {
+  const updated = await apiFetch<IngredientRecordDto>(`/api/v1/ingredients/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      ingredientName: input.name,
+      ingredientDate: input.expiryDate,
+      ingredientEtc: input.memo ?? null,
+      imgUrl: input.emoji,
+      amount: input.quantity,
+      location: input.category,
+    }),
+  })
+  return toIngredient(updated)
+}
+
 export async function deleteIngredient(id: string): Promise<void> {
   await apiFetch<void>(`/api/v1/ingredients/${id}`, { method: 'DELETE' })
 }
