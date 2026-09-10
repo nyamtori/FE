@@ -4,6 +4,7 @@ import { BottomNav } from './components/BottomNav'
 import { MyKitchen } from './pages/MyKitchen'
 import { MyFridge } from './pages/MyFridge'
 import { MyRecipe } from './pages/MyRecipe'
+import { OAuthCallback } from './pages/OAuthCallback'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route path="/kitchen" element={<MyKitchen />} />
             <Route path="/fridge" element={<MyFridge />} />
             <Route path="/recipes" element={<MyRecipe />} />
+            <Route path="/oauth/callback" element={<OAuthCallback />} />
           </Routes>
           <BottomNav />
         </div>

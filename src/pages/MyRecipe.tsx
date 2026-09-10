@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react'
 import { useApp } from '../context/AppContext'
 import { RecipeCard } from '../components/RecipeCard'
 import { RecipeDetailModal } from '../components/RecipeDetailModal'
+import { LoginGate } from '../components/LoginGate'
 import type { Recipe } from '../types'
 
 export function MyRecipe() {
-  const { ingredients, recipes, toggleFavorite } = useApp()
+  const { ingredients, recipes, toggleFavorite, isAuthenticated, login, logout } = useApp()
   const [query, setQuery] = useState('')
   const [openRecipe, setOpenRecipe] = useState<Recipe | null>(null)
 
@@ -17,9 +18,23 @@ export function MyRecipe() {
     [recipes, query]
   )
 
+  if (!isAuthenticated) {
+    return (
+      <div className="px-5 pb-28 pt-6">
+        <h1 className="mb-4 text-2xl font-extrabold text-brand-brown">마이 레시피</h1>
+        <LoginGate onLogin={login} message="찜한 레시피를 보려면 카카오 로그인이 필요해요" />
+      </div>
+    )
+  }
+
   return (
     <div className="px-5 pb-28 pt-6">
-      <h1 className="text-2xl font-extrabold text-brand-brown">마이 레시피</h1>
+      <div className="mb-1 flex items-center justify-between">
+        <h1 className="text-2xl font-extrabold text-brand-brown">마이 레시피</h1>
+        <button onClick={logout} className="text-xs font-semibold text-brand-brown/50 underline">
+          로그아웃
+        </button>
+      </div>
       <p className="mb-4 text-sm text-brand-brown/60">찜한 레시피 {recipes.filter((r) => r.isFavorite).length}개</p>
 
       <div className="mb-4 flex items-center gap-2 rounded-full bg-white px-4 py-3">
