@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-기본적으로 `http://localhost:8081`(백엔드, `nyamtori/BE`)로 요청을 보냅니다. 백엔드 주소를 바꾸려면 `.env`의 `VITE_API_BASE_URL`을 수정하세요. 백엔드는 별도로 (Spring Boot, `./gradlew bootRun`) 실행해야 합니다.
+기본적으로 배포 백엔드 `https://nyamtori.y2b.store`로 요청을 보냅니다. 다른 백엔드 주소를 사용하려면 `.env`의 `VITE_API_BASE_URL`을 수정하세요. 로컬 백엔드를 사용할 때는 `http://localhost:8081`로 설정하고 Spring Boot 서버를 별도로 실행해야 합니다.
 
 ## Architecture
 
